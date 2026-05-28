@@ -6,8 +6,9 @@ Verifica:
 1. Se la directory è dentro un repo git
 2. Se ci sono file staged
 3. Estrae il diff delle modifiche staged
-4. Usa GPT-4.1 per generare un messaggio di commit (lingua configurabile)
-5. Effettua il commit
+4. Usa smart diff processor per ottimizzare il contesto
+5. Usa GPT-4.1 per generare un messaggio di commit (lingua configurabile)
+6. Effettua il commit
 """
 
 import argparse
@@ -24,6 +25,7 @@ except ImportError:
     sys.exit(1)
 
 from ut_locales import get_messages
+from ut_smart_diff_processor import DiffParser, DiffTruncator
 
 
 class GitCommitHelper:
@@ -112,18 +114,39 @@ class GitCommitHelper:
 
     def truncate_diff(self, diff: str, max_length: int = 20_000) -> Tuple[str, bool]:
         """
-        Tronca il diff se troppo lungo.
+        Tronca il diff usando strategia intelligente (smart processor).
+
+        Applica:
+        - Strategia 1: Context-aware truncation basata sulla dimensione dei file
+        - Strategia 2: Budget-aware prioritization se il diff è molto grande
 
         Args:
             diff: il diff completo
-            max_length: lunghezza massima
+            max_length: lunghezza massima (usato come fallback)
 
         Returns:
-            Tuple[str, bool]: (diff_troncato, is_truncated)
+            Tuple[str, bool]: (diff_processato, was_truncated)
         """
-        if len(diff) > max_length:
-            return diff[:max_length] + "\n... [TRUNCATED] ...", True
-        return diff, False
+        try:
+            # Usa lo smart processor
+            parser = DiffParser(diff)
+            truncator = DiffTruncator(parser.files)
+            result = truncator.truncate_all()
+
+            # Formatta l'output
+            processed_diff = truncator.format_output(
+                result['files'],
+                result['total_tokens'],
+                result['truncated']
+            )
+
+            return processed_diff, result['truncated']
+        except Exception as e:
+            # Fallback al metodo semplice se lo smart processor fallisce
+            self._info(f"⚠️ Smart processor fallback: {str(e)}")
+            if len(diff) > max_length:
+                return diff[:max_length] + "\n... [TRUNCATED] ...", True
+            return diff, False
 
     def generate_commit_message(self, diff: str) -> Optional[str]:
         """
@@ -135,10 +158,12 @@ class GitCommitHelper:
         Returns:
             str: il messaggio di commit generato, o None se errore
         """
-        diff_truncated, was_truncated = self.truncate_diff(diff)
+        diff_truncated, was_processed = self.truncate_diff(diff)
 
-        if was_truncated:
-            self._info(self.messages["diff_truncated"])
+        if was_processed:
+            self._success(self.messages["diff_smart_processed"])
+        else:
+            self._success(self.messages["diff_truncated"])
 
         prompt = self.messages["prompt_instruction"].format(diff=diff_truncated)
 

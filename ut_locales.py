@@ -4,7 +4,8 @@ MESSAGES = {
     "en": {
         "import_error": "❌ Errore: openai library non installata. Installa con: pip install openai",
         "api_key_missing": "❌ OPENAI_API_KEY non trovata. Configura la variabile d'ambiente.",
-        "diff_truncated": "⚠️ Diff troncato per evitare sovraccarico API",
+        "diff_truncated": "⚠️ Diff optimized with smart processor to balance context and token budget",
+        "diff_smart_processed": "✅ Diff processed with smart strategy (strategy 1: context-aware + strategy 2: budget-aware)",
         "prompt_instruction": """Ti passo il diff di un commit su git:
 
 Proponimi un testo in inglese preciso e dettagliato per il commit composto da una prima riga lunga al massimo 50 caratteri seguita da due caratteri di capo e poi tutto il testo che ritieni necessario in linee lunghe al massimo 80 caratteri.
@@ -49,7 +50,8 @@ RISPOSTA (SOLO il messaggio di commit, senza spiegazioni aggiuntive):""",
     "it": {
         "import_error": "❌ Errore: openai library non installata. Installa con: pip install openai",
         "api_key_missing": "❌ OPENAI_API_KEY non trovata. Configura la variabile d'ambiente.",
-        "diff_truncated": "⚠️ Diff troncato per evitare sovraccarico API",
+        "diff_truncated": "⚠️ Diff ottimizzato con smart processor (bilancia contesto e token budget)",
+        "diff_smart_processed": "✅ Diff processato con strategia intelligente (strategia 1: context-aware + strategia 2: budget-aware)",
         "prompt_instruction": """Ti passo il diff di un commit su git:
 
 Proponimi un testo in italiano preciso e dettagliato per il commit composto da una prima riga lunga al massimo 50 caratteri seguita da due caratteri di capo e poi tutto il testo che ritieni necessario in linee lunghe al massimo 80 caratteri.
