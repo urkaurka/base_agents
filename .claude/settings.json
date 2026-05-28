@@ -1,0 +1,25 @@
+{
+  "projectName": "Area Base Agents - Smart Diff Fully Integrated",
+  "description": "Intelligent agents for base area tasks",
+  "smartDiff": {
+    "enabled": true,
+    "strategies": {
+      "strategy1": {
+        "name": "Context-aware truncation",
+        "smallFileThreshold": 300,
+        "mediumFileThreshold": 1500,
+        "contextWindow": {
+          "small": 100,
+          "large": 10
+        }
+      },
+      "strategy2": {
+        "name": "Budget-aware prioritization",
+        "tokenBudget": 30000,
+        "overheadTokens": 5000,
+        "enabled": true
+      }
+    },
+    "scriptPath": "ut_smart_diff_processor.py"
+  }
+}
